@@ -4,7 +4,28 @@ import time
 import sys
 import os
 import signal
+import importlib
 from datetime import datetime
+
+PACKAGES = {
+    "telebot": "pyTelegramBotAPI",
+    "telegram": "python-telegram-bot",
+    "pyrogram": "pyrogram",
+    "requests": "requests",
+}
+
+
+def ensure_dependencies():
+    for mod, pkg in PACKAGES.items():
+        try:
+            importlib.import_module(mod)
+        except ImportError:
+            print(f"[SETUP] Installing missing package: {pkg}...", flush=True)
+            subprocess.check_call(
+                [sys.executable, "-m", "pip", "install", pkg, "--quiet"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+            print(f"[SETUP] {pkg} installed.", flush=True)
 
 BOTS = [
     "Bomb spam.py",
@@ -55,6 +76,7 @@ def monitor_bot(bot_file):
 
 
 def main():
+    ensure_dependencies()
     log("MAIN", f"Starting {len(BOTS)} bots...")
     log("MAIN", "-" * 50)
 
