@@ -4,23 +4,21 @@ import time
 import sys
 import os
 import signal
-import importlib
 from datetime import datetime
 
-PACKAGES = {
-    "telebot": "pyTelegramBotAPI",
-    "telegram": "python-telegram-bot",
-    "pyrogram": "pyrogram",
-    "requests": "requests",
-}
+REQUIREMENTS = [
+    "pyTelegramBotAPI", "python-telegram-bot", "pyrogram", "requests",
+]
 
 
 def ensure_dependencies():
-    for mod, pkg in PACKAGES.items():
-        try:
-            importlib.import_module(mod)
-        except ImportError:
-            print(f"[SETUP] Installing missing package: {pkg}...", flush=True)
+    for pkg in REQUIREMENTS:
+        result = subprocess.run(
+            [sys.executable, "-m", "pip", "show", pkg],
+            capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            print(f"[SETUP] Installing: {pkg}...", flush=True)
             subprocess.check_call(
                 [sys.executable, "-m", "pip", "install", pkg, "--quiet"],
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
